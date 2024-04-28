@@ -23,12 +23,27 @@ const keyboardShortcuts = KeyboardShortcuts.create({
   keyboardConfig: KeyboardShortcuts.HOME_ROW,
 });
 
+const handleSelectNote = (noteData) => {
+  setSelectedNotes((prevSelectedNotes) => {
+    const isNoteSelected = prevSelectedNotes.find((selected) => selected.note === note.note);
+    if (isNoteSelected) {
+      // Remove the note if it was already selected
+      return prevSelectedNotes.filter((selected) => selected.note !== note.note);
+    } else if (prevSelectedNotes.length < 2) {
+      // Add the note if it wasn't selected and less than 2 notes are selected
+      return [...prevSelectedNotes, note];
+    }
+    return prevSelectedNotes;
+  });
+};
+
 function App() {
+  
   return (
     <div className="app-container">
       <TemporaryDrawer />
       <div className="circle-container">
-        <CircleOfFifths />
+        <CircleOfFifths onSelectNote={handleSelectNote} />
       </div>
       <div className="piano-container">
         <ResponsivePiano />
