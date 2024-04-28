@@ -26,7 +26,7 @@ html, body {
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 99.9vh; /* Full height of the viewport */
+  height: 99vh; /* Full height of the viewport */
   overflow: hidden; /* Hide any content that overflows */
   margin: 0;
 }
@@ -48,39 +48,6 @@ html, body {
 /* Ensure the Piano component sizes with the container */
 .responsive-piano {
   width: 100%;
-}
-
-/* Sidebar.css file */
-.sidebar-container {
-  position: fixed; /* Fixed position to stay in view */
-  top: 0;
-  left: 0;
-  height: 100%;
-  z-index: 1000; /* Ensure it's above other content */
-}
-
-.sidebar-toggle {
-  position: absolute;
-  top: 50%;
-  right: -60px; /* Position the button to the left of the sidebar */
-  transform: translateY(-50%);
-  z-index: 1001; /* Above the sidebar */
-}
-
-.sidebar {
-  height: 100%;
-  background: white;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
-  width: 250px; /* Sidebar width */
-  transition: transform 0.3s ease-in-out;
-}
-
-.sidebar.open {
-  transform: translateX(0); /* Show sidebar */
-}
-
-.sidebar.closed {
-  transform: translateX(-250px); /* Hide sidebar */
 }
 
 

@@ -8,17 +8,17 @@ const CircleOfFifths = ({ onSelectNote }) => {
   useEffect(() => {
     const notes = [
       { note: 'C', num: 0 },
-      { note: 'G', num: 1 },
+      { note: 'C♯', num: 1 },
       { note: 'D', num: 2 },
-      { note: 'A', num: 3 },
+      { note: 'E♭', num: 3 },
       { note: 'E', num: 4 },
-      { note: 'B', num: 5 },
+      { note: 'F', num: 5 },
       { note: 'F♯', num: 6 },
-      { note: 'C♯', num: 7 },
+      { note: 'G', num: 7 },
       { note: 'G♯', num: 8 },
-      { note: 'E♭', num: 9 },
+      { note: 'A', num: 9 },
       { note: 'B♭', num: 10 },
-      { note: 'F', num: 11 }
+      { note: 'B', num: 11 }
     ];
 
     const width = 500;
