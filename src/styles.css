@@ -1,0 +1,86 @@
+.PianoDarkTheme .ReactPiano__Key--accidental {
+  background: #025d7d;
+  border: 1px solid #888;
+}
+.PianoDarkTheme .ReactPiano__Key--natural {
+  background: #013243;
+  border: 1px solid #888;
+  margin-right: 0;
+}
+.PianoDarkTheme .ReactPiano__Key--active.ReactPiano__Key--accidental {
+  background: #0396ca;
+}
+.PianoDarkTheme .ReactPiano__Key--active.ReactPiano__Key--natural {
+  background: #0396ca;
+}
+
+/* Add this to your styles.css */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevent scrolling */
+}
+
+/* Update your app-container styles */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 99.9vh; /* Full height of the viewport */
+  overflow: hidden; /* Hide any content that overflows */
+  margin: 0;
+}
+
+.circle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh; /* Or adjust based on your design needs */
+}
+
+.piano-container {
+  display: flex;
+  justify-content: center;
+  flex: 1;
+  align-items: flex-end;
+}
+
+/* Ensure the Piano component sizes with the container */
+.responsive-piano {
+  width: 100%;
+}
+
+/* Sidebar.css file */
+.sidebar-container {
+  position: fixed; /* Fixed position to stay in view */
+  top: 0;
+  left: 0;
+  height: 100%;
+  z-index: 1000; /* Ensure it's above other content */
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: 50%;
+  right: -60px; /* Position the button to the left of the sidebar */
+  transform: translateY(-50%);
+  z-index: 1001; /* Above the sidebar */
+}
+
+.sidebar {
+  height: 100%;
+  background: white;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+  width: 250px; /* Sidebar width */
+  transition: transform 0.3s ease-in-out;
+}
+
+.sidebar.open {
+  transform: translateX(0); /* Show sidebar */
+}
+
+.sidebar.closed {
+  transform: translateX(-250px); /* Hide sidebar */
+}
+
+
