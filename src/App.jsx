@@ -47,11 +47,8 @@ function App() {
       </Box>
       <Box sx={{
         width: '100%',
-        display: 'flex', // Changed from 'block' to 'flex'
-        flexDirection: 'column', // Ensure vertical layout
-        justifyContent: 'flex-end', // Align piano at the bottom
-        mt: 'auto', // Pushes to the bottom
-        p: 0,
+        position: 'fixed',
+        bottom: 0,
       }}>
         <ResponsivePiano />
       </Box>
