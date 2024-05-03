@@ -8,6 +8,17 @@ function CircleOfFifths({ onSelectNote }) {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [size, setSize] = useState(window.innerWidth * 0.9) // Default to 90% of window width
 
+  function debounce(fn, ms) {
+    let timer
+    return _ => {
+      clearTimeout(timer)
+      timer = setTimeout(_ => {
+        timer = null
+        fn.apply(this, arguments)
+      }, ms)
+    }
+  }
+
   useEffect(() => {
     function handleResize() {
       if (isMobile) {
@@ -15,13 +26,16 @@ function CircleOfFifths({ onSelectNote }) {
       }
     }
 
-    const timer = setTimeout(() => {
-      handleResize()
-    }, 100) // Delay slightly to allow for full layout render
+    // Wrap the handleResize with debounce
+    const debouncedHandleResize = debounce(handleResize, 100)
 
+    // Initial call and setup of resize event listener
+    debouncedHandleResize()
+    window.addEventListener('resize', debouncedHandleResize)
+
+    // Cleanup function to remove the event listener
     return () => {
-      clearTimeout(timer)
-      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('resize', debouncedHandleResize)
     }
   }, [isMobile])
 
