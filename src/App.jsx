@@ -11,7 +11,7 @@ function App() {
 
   return (
     <Container maxWidth={false} sx={{
-      height: '100vh', // Full viewport height
+      height: 'calc(100vh - 64px)',
       position: 'relative',
       display: 'flex',
       flexDirection: 'column',
@@ -40,7 +40,7 @@ function App() {
           justifyContent="center"
           alignItems="center"
         >
-          <Grid item xs={1} lg={12}>
+          <Grid item xs={12} lg={12}>
             <CircleOfFifths />
           </Grid>
           <Box sx={{
