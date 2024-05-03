@@ -11,12 +11,13 @@ function App() {
 
   return (
     <Container maxWidth={false} sx={{
-      height: '100vh',
+      height: '100vh', // Full viewport height
       position: 'relative',
       display: 'flex',
       flexDirection: 'column',
       p: 0,
       m: 0,
+      overflow: 'hidden' // Prevent scrolling
     }}>
       <Box sx={{
         position: 'absolute',
@@ -44,7 +45,14 @@ function App() {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ width: '100%', display: 'block', mt: 'auto', p: 0 }}>
+      <Box sx={{
+        width: '100%',
+        display: 'flex', // Changed from 'block' to 'flex'
+        flexDirection: 'column', // Ensure vertical layout
+        justifyContent: 'flex-end', // Align piano at the bottom
+        mt: 'auto', // Pushes to the bottom
+        p: 0,
+      }}>
         <ResponsivePiano />
       </Box>
     </Container>
