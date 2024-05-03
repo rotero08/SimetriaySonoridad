@@ -15,10 +15,12 @@ function CircleOfFifths({ onSelectNote }) {
       }
     }
 
-    handleResize() // Initial call
-    window.addEventListener('resize', handleResize)
+    const timer = setTimeout(() => {
+      handleResize()
+    }, 100) // Delay slightly to allow for full layout render
 
     return () => {
+      clearTimeout(timer)
       window.removeEventListener('resize', handleResize)
     }
   }, [isMobile])
