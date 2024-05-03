@@ -6,12 +6,12 @@ function CircleOfFifths({ onSelectNote }) {
   const ref = useRef()
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const [size, setSize] = useState(window.innerWidth * 0.9) // Default to 90% of window width
+  const [size, setSize] = useState(window.innerWidth * 0.8) // Default to 90% of window width
 
   useEffect(() => {
     function handleResize() {
       if (isMobile) {
-        setSize(window.innerWidth * 0.9) // Adjust size to 90% of window width only if mobile
+        setSize(window.innerWidth * 0.8) // Adjust size to 90% of window width only if mobile
       }
     }
 
