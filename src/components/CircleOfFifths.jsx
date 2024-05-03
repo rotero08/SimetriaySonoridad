@@ -1,8 +1,14 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import * as d3 from 'd3'
+import { useTheme, useMediaQuery } from '@mui/material'
 
 function CircleOfFifths({ onSelectNote }) {
   const ref = useRef()
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+
+  const [size, setSize] = useState(isMobile ? 300 : 500) // Smaller size for mobile
+
 
   useEffect(() => {
     const notes = [
@@ -20,8 +26,9 @@ function CircleOfFifths({ onSelectNote }) {
       { note: 'B', num: 11 },
     ]
 
-    const width = 500
-    const height = 500
+    // Dynamically adjust size based on the device
+    const width = size
+    const height = size
     const margin = 50
     const radius = Math.min(width, height) / 2 - margin
 
@@ -100,9 +107,13 @@ function CircleOfFifths({ onSelectNote }) {
       .attr('stroke', 'black')
       .style('cursor', 'pointer')
       .on('click', (d) => onSelectNote && onSelectNote(d))
-  }, [])
+  }, [size])
 
-  return <div ref={ref} className="circle-of-fifths" />
+  useEffect(() => {
+    setSize(isMobile ? 300 : 500)
+  }, [isMobile])
+
+  return <div ref={ref} className="circle-of-fifths" style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }} />
 }
 
 export default CircleOfFifths
