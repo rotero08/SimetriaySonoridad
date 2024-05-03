@@ -50,4 +50,15 @@ html, body {
   width: 100%;
 }
 
+/* Additional styles.css or within your component's makeStyles hook */
+@media (max-width: 600px) { /* Typically mobile breakpoints */
+  .drawer-mobile {
+    width: 100%; /* Full width for mobile */
+    min-height: 200px; /* Larger minimum height for better touch accessibility */
+  }
+  .circle-mobile {
+    font-size: 1.5rem; /* Larger text for visibility on small screens */
+  }
+}
 
+/* Add these classes conditionally or adjust your components to include these styles */

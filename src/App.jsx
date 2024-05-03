@@ -23,16 +23,28 @@ const handleSelectNote = (noteData) => {
 
 function App() {
   return (
-    <Container maxWidth="xl">
-      <Box sx={{ position: 'absolute', top: 0, left: 0, zIndex: 1200 }}>
+    <Container maxWidth="xl" sx={{ height: '100vh', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{
+        position: 'absolute', top: 0, left: 0, zIndex: 1200,
+        width: { xs: '100%', sm: 'auto' }, // Drawer takes full width on small screens
+      }}>
         <TemporaryDrawer />
       </Box>
-      <Box height={600} sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Grid item xs={12}>
-          <CircleOfFifths />
+      <Box sx={{
+        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        p: { xs: 3, sm: 2 } // More padding on smaller screens
+      }}>
+        <Grid container spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <Grid item xs={12} md={8} lg={6}>
+            <CircleOfFifths sx={{
+              fontSize: { xs: '1.5rem', sm: '1rem' } // Larger font size for smaller screens
+            }} />
+          </Grid>
         </Grid>
       </Box>
-      <ResponsivePiano/>
+      <Box sx={{ width: '100%', mt: 'auto' }}>
+        <ResponsivePiano />
+      </Box>
     </Container>
   )
 }
