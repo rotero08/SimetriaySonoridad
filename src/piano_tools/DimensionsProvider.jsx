@@ -10,17 +10,18 @@ class DimensionsProvider extends React.Component {
     this.updateDimensions()
     window.addEventListener('resize', this.updateDimensions)
     // Adding a delayed update to handle URL bar visibility changes
-    setTimeout(this.updateDimensions, 300)  // Adjust delay as needed
+    window.addEventListener('orientationchange', this.updateDimensions)  // Adjust delay as needed
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.updateDimensions)
+    window.removeEventListener('orientationchange', this.updateDimensions)
   }
 
   updateDimensions = () => {
     const isMobile = window.innerWidth < 768 // Consider adjusting based on your breakpoints
     const width = isMobile ? window.innerWidth : this.container.offsetWidth
-    const height = this.container.offsetHeight
+    const height = window.innerHeight
 
     this.setState({
       containerWidth: width,
@@ -30,7 +31,7 @@ class DimensionsProvider extends React.Component {
 
   render() {
     return (
-      <div ref={(el) => (this.container = el)} style={{ width: '100%', height: '100%' }}>
+      <div ref={(el) => (this.container = el)} style={{ width: '100%', height: '100%', bottom: 0 }}>
         {this.props.children(this.state)}
       </div>
     )

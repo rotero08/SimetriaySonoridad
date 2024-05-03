@@ -44,7 +44,7 @@ function App() {
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ width: '100%', mt: 'auto', p: 0 }}>
+      <Box sx={{ width: '100%', display: 'block', mt: 'auto', p: 0 }}>
         <ResponsivePiano />
       </Box>
     </Container>
