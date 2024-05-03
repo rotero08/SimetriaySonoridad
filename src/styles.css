@@ -14,13 +14,19 @@
   background: #0396ca;
 }
 
-/* Add this to your styles.css */
-html, body {
-  height: 100%;
+/* Example CSS to reset margins and padding that could affect layout */
+body, html {
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent scrolling */
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
+
+/* Ensure the piano container has no unwanted spacing */
+.piano-container {
+  margin: 0;
+  width: 100%;
+}
+
 
 /* Update your app-container styles */
 .app-container {
@@ -36,13 +42,6 @@ html, body {
   justify-content: center;
   align-items: center;
   height: 50vh; /* Or adjust based on your design needs */
-}
-
-.piano-container {
-  display: flex;
-  justify-content: center;
-  flex: 1;
-  align-items: flex-end;
 }
 
 .piano-class { /* replace with actual class or style reference used within ResponsivePiano */

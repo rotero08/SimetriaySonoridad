@@ -16,9 +16,14 @@ class DimensionsProvider extends React.Component {
   }
 
   updateDimensions = () => {
+    // Use viewport width on mobile devices to ensure it doesn't exceed screen size
+    const isMobile = window.innerWidth < 768 // Example breakpoint for mobile devices
+    const width = isMobile ? window.innerWidth : this.container.offsetWidth
+    const height = this.container.offsetHeight
+
     this.setState({
-      containerWidth: this.container.offsetWidth,
-      containerHeight: this.container.offsetHeight,
+      containerWidth: width,
+      containerHeight: height,
     })
   }
 
@@ -32,4 +37,3 @@ class DimensionsProvider extends React.Component {
 }
 
 export default DimensionsProvider
-

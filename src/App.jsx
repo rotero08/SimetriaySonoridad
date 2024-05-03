@@ -10,13 +10,13 @@ function App() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   return (
-    <Container maxWidth="false" sx={{
+    <Container maxWidth={false} sx={{
       height: '100vh',
       position: 'relative',
       display: 'flex',
       flexDirection: 'column',
-      padding: 0, // Remove default padding to ensure full width
-      maxWidth: '100%' // Ensure the container is not restricting the width
+      p: 0,
+      m: 0,
     }}>
       <Box sx={{
         position: 'absolute',
@@ -37,13 +37,14 @@ function App() {
         <Grid container sx={{ justifyContent: 'center', alignItems: 'center', height: '100%' }}>
           <Grid item xs={12} md={8} lg={6}>
             <CircleOfFifths sx={{
-              width: isMobile ? '90%' : 'auto', // Smaller on mobile for better fit
+              width: isMobile ? `${100 - 10}vw` : 500, // Adjust size dynamically
+              height: isMobile ? `${100 - 10}vw` : 500,
               fontSize: isMobile ? '1.5rem' : '1rem',
             }} />
           </Grid>
         </Grid>
       </Box>
-      <Box sx={{ width: '100%', mt: 'auto' }}>
+      <Box sx={{ width: '100%', mt: 'auto', p: 0 }}>
         <ResponsivePiano />
       </Box>
     </Container>
