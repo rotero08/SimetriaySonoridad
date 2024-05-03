@@ -136,7 +136,7 @@ function CircleOfFifths({ onSelectNote }) {
       .attr('stroke', 'black')
       .style('cursor', 'pointer')
       .on('click', (d) => onSelectNote && onSelectNote(d))
-  }, [size])
+  }, [onSelectNote, size])
 
   useEffect(() => {
     setSize(isMobile ? 400 : 500)

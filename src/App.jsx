@@ -5,6 +5,22 @@ import CircleOfFifths from './components/CircleOfFifths'
 import TemporaryDrawer from './components/Sidebar'
 import ResponsivePiano from './components/Piano'
 
+/*
+const handleSelectNote = (noteData) => {
+  setSelectedNotes((prevSelectedNotes) => {
+    const isNoteSelected = prevSelectedNotes.find((selected) => selected.note === note.note)
+    if (isNoteSelected) {
+      // Remove the note if it was already selected
+      return prevSelectedNotes.filter((selected) => selected.note !== note.note)
+    } if (prevSelectedNotes.length < 2) {
+      // Add the note if it wasn't selected and less than 2 notes are selected
+      return [...prevSelectedNotes, note]
+    }
+    return prevSelectedNotes
+  })
+}
+*/
+
 function App() {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -41,7 +57,7 @@ function App() {
           alignItems="center"
         >
           <Grid item xs={12} lg={12}>
-            <CircleOfFifths />
+            <CircleOfFifths/>
           </Grid>
           <Box sx={{
             width: '100%',
@@ -57,4 +73,3 @@ function App() {
 }
 
 export default App
-

@@ -25,7 +25,7 @@ const keyboardShortcuts = KeyboardShortcuts.create({
 
 export default function ResponsivePiano(props) {
   return (
-    <div className="piano-container">
+    <div className='piano-container'>
       <DimensionsProvider>
         {({ containerWidth }) => {
           const numberOfKeys = Math.max(Math.floor(containerWidth / minKeyWidth), lastNote - firstNote + 1)
@@ -56,4 +56,3 @@ export default function ResponsivePiano(props) {
     </div>
   )
 }
-
