@@ -7,8 +7,7 @@ function CircleOfFifths({ onSelectNote }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
-  const [size, setSize] = useState(isMobile ? 300 : 500) // Smaller size for mobile
-
+  const [size, setSize] = useState(isMobile ? 400 : 500) // Smaller size for mobile
 
   useEffect(() => {
     const notes = [
@@ -110,7 +109,7 @@ function CircleOfFifths({ onSelectNote }) {
   }, [size])
 
   useEffect(() => {
-    setSize(isMobile ? 300 : 500)
+    setSize(isMobile ? 400 : 500)
   }, [isMobile])
 
   return <div ref={ref} className="circle-of-fifths" style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }} />

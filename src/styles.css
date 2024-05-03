@@ -45,6 +45,12 @@ html, body {
   align-items: flex-end;
 }
 
+.piano-class { /* replace with actual class or style reference used within ResponsivePiano */
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 /* Ensure the Piano component sizes with the container */
 .responsive-piano {
   width: 100%;
