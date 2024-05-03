@@ -9,6 +9,8 @@ class DimensionsProvider extends React.Component {
   componentDidMount() {
     this.updateDimensions()
     window.addEventListener('resize', this.updateDimensions)
+    // Adding a delayed update to handle URL bar visibility changes
+    setTimeout(this.updateDimensions, 300)  // Adjust delay as needed
   }
 
   componentWillUnmount() {
@@ -16,8 +18,7 @@ class DimensionsProvider extends React.Component {
   }
 
   updateDimensions = () => {
-    // Use viewport width on mobile devices to ensure it doesn't exceed screen size
-    const isMobile = window.innerWidth < 768 // Example breakpoint for mobile devices
+    const isMobile = window.innerWidth < 768 // Consider adjusting based on your breakpoints
     const width = isMobile ? window.innerWidth : this.container.offsetWidth
     const height = this.container.offsetHeight
 
@@ -37,3 +38,4 @@ class DimensionsProvider extends React.Component {
 }
 
 export default DimensionsProvider
+

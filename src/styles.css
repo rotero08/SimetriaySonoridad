@@ -21,12 +21,18 @@ body, html {
   overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
-/* Ensure the piano container has no unwanted spacing */
+/* Assuming your container might have a class or directly style the piano container */
 .piano-container {
   margin: 0;
-  width: 100%;
+  padding: 0;
+  width: 100%;  /* This ensures it takes full width */
 }
 
+/* Specific override for the piano component if necessary */
+.responsive-piano-container {
+  padding: 0 !important; /* Important might be necessary to override other styles */
+  margin: 0 !important;
+}
 
 /* Update your app-container styles */
 .app-container {

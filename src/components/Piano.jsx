@@ -20,24 +20,26 @@ const keyboardShortcuts = KeyboardShortcuts.create({
 
 export default function ResponsivePiano(props) {
   return (
-    <DimensionsProvider>
-      {({ containerWidth, containerHeight }) => (
-        <SoundfontProvider
-          instrumentName="acoustic_grand_piano"
-          audioContext={audioContext}
-          hostname={soundfontHostname}
-          render={({ isLoading, playNote, stopNote }) => (
-            <Piano
-              noteRange={noteRange}
-              width={containerWidth}
-              playNote={playNote}
-              stopNote={stopNote}
-              disabled={isLoading}
-              {...props}
-            />
-          )}
-        />
-      )}
-    </DimensionsProvider>
+    <div className="piano-container">
+      <DimensionsProvider>
+        {({ containerWidth, containerHeight }) => (
+          <SoundfontProvider
+            instrumentName="acoustic_grand_piano"
+            audioContext={audioContext}
+            hostname={soundfontHostname}
+            render={({ isLoading, playNote, stopNote }) => (
+              <Piano
+                noteRange={noteRange}
+                width={containerWidth}
+                playNote={playNote}
+                stopNote={stopNote}
+                disabled={isLoading}
+                {...props}
+              />
+            )}
+          />
+        )}
+      </DimensionsProvider>
+    </div>
   )
 }
