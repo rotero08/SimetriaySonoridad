@@ -19,7 +19,7 @@ class DimensionsProvider extends React.Component {
   }
 
   updateDimensions = () => {
-    const isMobile = window.innerWidth < 768 // Consider adjusting based on your breakpoints
+    const isMobile = window.innerWidth < 768 // Mobile breakpoint
     const width = isMobile ? window.innerWidth : this.container.offsetWidth
     const height = window.innerHeight
 
@@ -31,7 +31,7 @@ class DimensionsProvider extends React.Component {
 
   render() {
     return (
-      <div ref={(el) => (this.container = el)} style={{ width: '100%', height: '100%', bottom: 0 }}>
+      <div ref={(el) => (this.container = el)} style={{ width: '100%', height: '20%', bottom: 0 }}>
         {this.props.children(this.state)}
       </div>
     )
