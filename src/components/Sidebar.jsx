@@ -66,7 +66,7 @@ export default function TemporaryDrawer({ transformation, setTransformation, num
   )
 
   return (
-    <div>
+    <Box>
       <IconButton color="primary" onClick={toggleDrawer(true)}>
         <MenuIcon />
       </IconButton>
@@ -79,6 +79,6 @@ export default function TemporaryDrawer({ transformation, setTransformation, num
       >
         {DrawerList}
       </Drawer>
-    </div>
+    </Box>
   )
 }
