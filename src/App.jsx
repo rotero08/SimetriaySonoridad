@@ -101,7 +101,7 @@ function App() {
               bottom: 0,
             }}
           >
-            <ResponsivePiano />
+            <ResponsivePiano selectedNotes={selectedNotes} />
           </Box>
         </Grid>
       </Box>
@@ -110,4 +110,3 @@ function App() {
 }
 
 export default App
-

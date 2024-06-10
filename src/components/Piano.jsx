@@ -1,8 +1,9 @@
-import ReactDOM from 'react-dom'
 import 'react-piano/dist/styles.css'
+import './customPianoStyles.css'
 import { Piano, KeyboardShortcuts, MidiNumbers } from 'react-piano'
 import SoundfontProvider from '../piano_tools/SoundfontProvider'
 import DimensionsProvider from '../piano_tools/DimensionsProvider'
+import React from 'react'
 
 // webkitAudioContext fallback needed to support Safari
 const audioContext = new (window.AudioContext || window.webkitAudioContext)()
@@ -23,7 +24,33 @@ const keyboardShortcuts = KeyboardShortcuts.create({
   keyboardConfig: KeyboardShortcuts.HOME_ROW,
 })
 
-export default function ResponsivePiano(props) {
+const noteToMidi = {
+  'C': MidiNumbers.fromNote('c3'),
+  'C♯': MidiNumbers.fromNote('c#3'),
+  'D': MidiNumbers.fromNote('d3'),
+  'E♭': MidiNumbers.fromNote('eb3'),
+  'E': MidiNumbers.fromNote('e3'),
+  'F': MidiNumbers.fromNote('f3'),
+  'F♯': MidiNumbers.fromNote('f#3'),
+  'G': MidiNumbers.fromNote('g3'),
+  'G♯': MidiNumbers.fromNote('g#3'),
+  'A': MidiNumbers.fromNote('a3'),
+  'B♭': MidiNumbers.fromNote('bb3'),
+  'B': MidiNumbers.fromNote('b3')
+}
+
+export default function ResponsivePiano({ selectedNotes }) {
+  // Convert selected notes to MIDI numbers
+  const activeMidiNotes = selectedNotes.map(note => noteToMidi[note])
+
+  const renderNoteLabel = ({ midiNumber, isActive }) => {
+    const isSelected = activeMidiNotes.includes(midiNumber)
+    const className = isSelected ? 'ReactPiano__Key--selected' : ''
+    return (
+      <div className={className} />
+    )
+  }
+
   return (
     <div className='piano-container'>
       <DimensionsProvider>
@@ -46,7 +73,8 @@ export default function ResponsivePiano(props) {
                   playNote={playNote}
                   stopNote={stopNote}
                   disabled={isLoading}
-                  {...props}
+                  renderNoteLabel={renderNoteLabel}
+                  keyboardShortcuts={keyboardShortcuts}
                 />
               )}
             />

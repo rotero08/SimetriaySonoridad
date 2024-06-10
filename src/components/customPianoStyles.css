@@ -1,0 +1,9 @@
+/* customPianoStyles.css */
+.ReactPiano__Key--selected {
+    background-color: blue !important;
+  }
+  
+  .ReactPiano__Key--transformed {
+    background-color: lightblue !important;
+  }
+  
