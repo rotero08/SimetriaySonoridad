@@ -1,41 +1,35 @@
 import React, { useState } from 'react'
+import OptionsMenu from './components/OptionsMenu'
 import CromaticCircle from './components/CromaticCircle'
 import TemporaryDrawer from './components/Sidebar'
 import ResponsivePiano from './components/Piano'
 
 function App() {
-
-  const [transformation, setTransformation] = useState(1)
   const [selectedNotes, setSelectedNotes] = useState([])
   const [numSelected, setNumSelected] = useState(2)
-  const [transformations, setTransformations] = useState([])
-
-  const addTransformation = () => {
-    setTransformations([...transformations, transformation])
-  }
-
-  const removeTransformation = (index) => {
-    const newTransformations = transformations.filter((_, i) => i !== index)
-    setTransformations(newTransformations)
-  }
+  const [vectors, setVectors] = useState([])
+  const [showNoteNames, setShowNoteNames] = useState(false)
 
   return (
     <div className="app-container">
-      <TemporaryDrawer
-        transformation={transformation}
-        setTransformation={setTransformation}
+      <OptionsMenu
         numSelected={numSelected}
         setNumSelected={setNumSelected}
-        transformations={transformations}
-        addTransformation={addTransformation}
-        removeTransformation={removeTransformation}
+        showNoteNames={showNoteNames}
+        setShowNoteNames={setShowNoteNames}
+      />
+      <TemporaryDrawer
+        vectors={vectors}
+        setVectors={setVectors}
+        showNoteNames={showNoteNames}
       />
       <div className="center-container">
         <CromaticCircle
           selectedNotes={selectedNotes}
           setSelectedNotes={setSelectedNotes}
           numSelected={numSelected}
-          transformations={transformations}
+          vectors={vectors}
+          setVectors={setVectors}
         />
       </div>
       <div className="piano-container">
@@ -46,4 +40,3 @@ function App() {
 }
 
 export default App
-
