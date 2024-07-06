@@ -1,62 +1,21 @@
-.PianoDarkTheme .ReactPiano__Key--accidental {
-  background: #025d7d;
-  border: 1px solid #888;
-}
-.PianoDarkTheme .ReactPiano__Key--natural {
-  background: #013243;
-  border: 1px solid #888;
-  margin-right: 0;
-}
-.PianoDarkTheme .ReactPiano__Key--active.ReactPiano__Key--accidental {
-  background: #0396ca;
-}
-.PianoDarkTheme .ReactPiano__Key--active.ReactPiano__Key--natural {
-  background: #0396ca;
-}
-
-/* Example CSS to reset margins and padding that could affect layout */
-body, html {
+html, body, #root, .app-container {
+  height: 100%;
   margin: 0;
-  padding: 0;
-  overflow-x: hidden; /* Prevent horizontal scroll */
+  overflow: hidden;
 }
 
-/* Assuming your container might have a class or directly style the piano container */
-.piano-container {
-  margin: 0;
-  padding: 0;
-  width: 100%;  /* This ensures it takes full width */
-}
-
-/* Specific override for the piano component if necessary */
-.responsive-piano-container {
-  padding: 0 !important; /* Important might be necessary to override other styles */
-  margin: 0 !important;
-}
-
-/* Update your app-container styles */
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 99vh; /* Full height of the viewport */
-  overflow: hidden; /* Hide any content that overflows */
-  margin: 0;
 }
 
-.circle-container {
+.center-container {
+  flex-grow: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 50vh; /* Or adjust based on your design needs */
 }
 
-.piano-class { /* replace with actual class or style reference used within ResponsivePiano */
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-/* Ensure the Piano component sizes with the container */
-.responsive-piano {
+.piano-container {
   width: 100%;
 }
