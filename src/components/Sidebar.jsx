@@ -21,6 +21,9 @@ const notes = [
   { note: 'B', num: 11 },
 ]
 
+const noteToNum = note => notes.find(n => n.note === note)?.num
+const numToNote = num => notes.find(n => n.num === num)?.note
+
 export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) {
   const [open, setOpen] = useState(false)
   const theme = useTheme()
@@ -33,31 +36,49 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
     setOpen(newOpen)
   }
 
+  const parseTransformation = (input) => {
+    if (typeof input !== 'string') {
+      return { transformation: 0, vector: [] }
+    }
+    const match = input.match(/^T(\d+)\(\[(.*)\]\)$/)
+    if (match) {
+      const transformation = parseInt(match[1], 10)
+      const vector = match[2].split(',').map(val => val.trim()).map(val => (isNaN(val) ? noteToNum(val) : parseInt(val, 10)))
+      return { transformation, vector }
+    } else {
+      const vector = input.replace(/[[\]]/g, '').split(',').map(val => val.trim()).map(val => (isNaN(val) ? noteToNum(val) : parseInt(val, 10)))
+      return { transformation: 0, vector }
+    }
+  }
+
   const validateVector = (vector) => {
     const uniqueValues = new Set(vector)
-    return uniqueValues.size === vector.length && vector.every(val => showNoteNames ? notes.some(n => n.note === val) : notes.some(n => n.num === parseInt(val)))
+    return uniqueValues.size === vector.length && vector.every(val => notes.some(n => n.note === val || n.num === val))
   }
 
   const handleEditVector = (index) => {
     setEditVectorIndex(index)
-    setTempVector(showNoteNames ? vectors[index].join(',') : vectors[index].map(note => notes.find(n => n.note === note).num).join(','))
+    const { transformation, vector } = parseTransformation(vectors[index])
+    if (transformation !== null && vector !== null) {
+      const displayVector = vector.map(val => showNoteNames ? (isNaN(val) ? val : numToNote(val)) : (isNaN(val) ? noteToNum(val) : val)).join(', ')
+      setTempVector(transformation ? `T${transformation}([${displayVector}])` : `[${displayVector}]`)
+    } else {
+      setTempVector(vectors[index])
+    }
     setErrorMessage('')
   }
 
   const handleSaveVector = (index) => {
-    const newVector = tempVector.split(',').map(val => val.trim())
-    if (validateVector(newVector)) {
-      const updatedVector = showNoteNames ? newVector : newVector.map(val => notes.find(n => n.num === parseInt(val)).note)
-      const newVectors = vectors.map((vector, i) => (
-        i === index ? updatedVector : vector
-      ))
+    const { transformation, vector } = parseTransformation(tempVector)
+    if (transformation !== null && vector !== null && validateVector(vector)) {
+      const updatedVector = transformation ? `T${transformation}([${vector.map(val => isNaN(val) ? noteToNum(val) : val).join(', ')}])` : `[${vector.map(val => isNaN(val) ? noteToNum(val) : val).join(', ')}]`
+      const newVectors = vectors.map((vec, i) => (i === index ? updatedVector : vec))
       setVectors(newVectors)
       setEditVectorIndex(null)
       setErrorMessage('')
     } else {
-      setErrorMessage('Invalid vector. Please enter unique and valid notes or numbers.')
-      setTempVector(showNoteNames ? vectors[index].join(',') : vectors[index].map(note => notes.find(n => n.note === note).num).join(','))
-      setTimeout(() => setErrorMessage(''), 5000) // Clear error message after 3 seconds
+      setErrorMessage('Invalid vector. Please enter a valid transformation and vector.')
+      setTimeout(() => setErrorMessage(''), 5000)
     }
   }
 
@@ -76,7 +97,7 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
   }
 
   const addVectorField = () => {
-    setVectors([...vectors, []])
+    setVectors([...vectors, '[]'])
   }
 
   const removeVector = (index) => {
@@ -86,44 +107,44 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
   const drawerWidth = isMobile ? '60%' : 450
 
   const DrawerList = (
-    <Box
-      sx={{ width: drawerWidth }}
-      role="presentation"
-      edge="start"
-    >
+    <Box sx={{ width: drawerWidth }} role="presentation" edge="start">
       <Box sx={{ padding: 2 }}>
-        {vectors.map((vector, index) => (
-          <Box key={index} sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
-            {editVectorIndex === index ? (
-              <TextField
-                value={tempVector}
-                onChange={handleTempVectorChange}
-                onBlur={() => handleBlur(index)}
-                onKeyPress={(e) => handleKeyPress(e, index)}
-                fullWidth
-                margin="dense"
-                sx={{ marginRight: 1 }}
-                error={!!errorMessage}
-                helperText={errorMessage}
-              />
-            ) : (
-              <TextField
-                label={`Vector ${index + 1}`}
-                value={showNoteNames ? vector.join(',') : vector.map(note => notes.find(n => n.note === note).num).join(',')}
-                onClick={() => handleEditVector(index)}
-                fullWidth
-                margin="dense"
-                sx={{ marginRight: 1 }}
-                InputProps={{
-                  readOnly: true,
-                }}
-              />
-            )}
-            <MuiIconButton edge="end" aria-label="delete" onClick={() => removeVector(index)}>
-              <DeleteIcon />
-            </MuiIconButton>
-          </Box>
-        ))}
+        {vectors.map((vector, index) => {
+          const { transformation, vector: parsedVector } = parseTransformation(vector)
+          const displayVector = parsedVector.map(val => showNoteNames ? (isNaN(val) ? val : numToNote(val)) : (isNaN(val) ? noteToNum(val) : val)).join(', ')
+          return (
+            <Box key={index} sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
+              {editVectorIndex === index ? (
+                <TextField
+                  value={tempVector}
+                  onChange={handleTempVectorChange}
+                  onBlur={() => handleBlur(index)}
+                  onKeyPress={(e) => handleKeyPress(e, index)}
+                  fullWidth
+                  margin="dense"
+                  sx={{ marginRight: 1 }}
+                  error={!!errorMessage}
+                  helperText={errorMessage}
+                />
+              ) : (
+                <TextField
+                  label={`Vector ${index + 1}`}
+                  value={transformation ? `T${transformation}([${displayVector}])` : `[${displayVector}]`}
+                  onClick={() => handleEditVector(index)}
+                  fullWidth
+                  margin="dense"
+                  sx={{ marginRight: 1 }}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                />
+              )}
+              <MuiIconButton edge="end" aria-label="delete" onClick={() => removeVector(index)}>
+                <DeleteIcon />
+              </MuiIconButton>
+            </Box>
+          )
+        })}
         <Box
           sx={{
             height: 56,
@@ -134,7 +155,7 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
             borderRadius: 1,
             color: 'text.secondary',
             cursor: 'pointer',
-            mt: 2
+            mt: 2,
           }}
           onClick={addVectorField}
         >
@@ -153,7 +174,7 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
         open={open}
         onClose={toggleDrawer(false)}
         sx={{
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
         }}
       >
         {DrawerList}
@@ -161,3 +182,4 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
     </Box>
   )
 }
+

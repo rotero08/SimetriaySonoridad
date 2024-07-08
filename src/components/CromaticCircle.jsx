@@ -20,7 +20,10 @@ const notes = [
 // Function to generate a color based on the index
 const generateColor = (index) => `hsl(${index * 137.508}, 100%, 50%)`
 
-function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors, setVectors }) {
+const noteToNum = note => notes.find(n => n.note === note)?.num
+const numToNote = num => notes.find(n => n.num === num)?.note
+
+function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors, setVectors, showNoteNames }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [size, setSize] = useState(window.innerWidth * 0.9)
@@ -45,25 +48,37 @@ function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors,
 
   useEffect(() => {
     if (selectedNotes.length === numSelected) {
-      setVectors([...vectors, [...selectedNotes]])
+      const newVector = selectedNotes.map(note => showNoteNames ? noteToNum(note) : note)
+      setVectors([...vectors, `[${newVector.join(',')}]`])
       setSelectedNotes([])
     }
-  }, [selectedNotes, numSelected, setVectors, vectors, setSelectedNotes])
+  }, [selectedNotes, numSelected, setVectors, vectors, setSelectedNotes, showNoteNames])
+
+  const parseTransformation = (input) => {
+    if (typeof input !== 'string') {
+      return { transformation: 0, vector: [] }
+    }
+    const match = input.match(/^T(\d+)\(\[(.*)\]\)$/)
+    if (match) {
+      const transformation = parseInt(match[1], 10)
+      const vector = match[2].split(',').map(val => val.trim()).map(val => (isNaN(val) ? noteToNum(val) : parseInt(val, 10)))
+      return { transformation, vector }
+    } else {
+      const vector = input.replace(/[[\]]/g, '').split(',').map(val => val.trim()).map(val => (isNaN(val) ? noteToNum(val) : parseInt(val, 10)))
+      return { transformation: 0, vector }
+    }
+  }
 
   const applyTransformations = (initialNotes) => {
     let result = [initialNotes]
-    vectors.forEach((vector, index) => {
-      console.log(`Applying transformation ${index + 1}: ${vector}`)
+    vectors.forEach((vectorStr, index) => {
+      const { transformation, vector } = parseTransformation(vectorStr)
       const transformed = vector.map((note) => {
-        const currentIndex = notes.findIndex((n) => n.note === note)
-        if (currentIndex === -1) return null // Handle invalid note
-        const newIndex = (currentIndex + notes.length) % notes.length
-        const newNote = notes[newIndex].note
-        console.log(`Transforming note ${note} at index ${currentIndex} to ${newNote} at index ${newIndex}`)
-        return newNote
-      }).filter(note => note !== null) // Filter out invalid notes
+        const noteNum = isNaN(note) ? noteToNum(note) : note
+        const newIndex = (noteNum + transformation) % notes.length
+        return numToNote(newIndex)
+      })
       result.push(transformed)
-      console.log(`Transformed notes after transformation ${index + 1}: ${transformed}`)
     })
     return result
   }
