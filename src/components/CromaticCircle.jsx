@@ -24,6 +24,7 @@ const noteToNum = note => notes.find(n => n.note === note)?.num
 const numToNote = num => notes.find(n => n.num === num)?.note
 
 function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors, setVectors, showNoteNames }) {
+  console.log(vectors)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [size, setSize] = useState(window.innerWidth * 0.9)
@@ -55,35 +56,46 @@ function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors,
   }, [selectedNotes, numSelected, setVectors, vectors, setSelectedNotes, showNoteNames])
 
   const parseTransformation = (input) => {
-    if (typeof input !== 'string') {
-      return { transformation: 0, vector: [] }
+    const regex = /^(T|I)(\d+)\((.*)\)$/
+
+    const parseNested = (input) => {
+      const match = input.match(regex)
+      if (match) {
+        const type = match[1]
+        const value = parseInt(match[2], 10)
+        const { transformations, vector } = parseNested(match[3])
+        return { transformations: [{ type, value }, ...transformations], vector }
+      } else {
+        const vector = input.replace(/[[\]]/g, '').split(',').map(val => val.trim()).map(val => (isNaN(val) ? noteToNum(val) : parseInt(val, 10)))
+        return { transformations: [], vector }
+      }
     }
-    const match = input.match(/^T(\d+)\(\[(.*)\]\)$/)
-    if (match) {
-      const transformation = parseInt(match[1], 10)
-      const vector = match[2].split(',').map(val => val.trim()).map(val => (isNaN(val) ? noteToNum(val) : parseInt(val, 10)))
-      return { transformation, vector }
-    } else {
-      const vector = input.replace(/[[\]]/g, '').split(',').map(val => val.trim()).map(val => (isNaN(val) ? noteToNum(val) : parseInt(val, 10)))
-      return { transformation: 0, vector }
+
+    return parseNested(input)
+  }
+
+  const applyTransformation = (vector, transformation) => {
+    if (transformation.type === 'T') {
+      return vector.map(note => (note + transformation.value) % 12)
+    } else if (transformation.type === 'I') {
+      return vector.map(note => (2 * transformation.value - note + 12) % 12)
     }
+    return vector
   }
 
   const applyTransformations = (initialNotes) => {
     let result = [initialNotes]
-    vectors.forEach((vectorStr, index) => {
-      const { transformation, vector } = parseTransformation(vectorStr)
-      const transformed = vector.map((note) => {
-        const noteNum = isNaN(note) ? noteToNum(note) : note
-        const newIndex = (noteNum + transformation) % notes.length
-        return numToNote(newIndex)
-      })
-      result.push(transformed)
+    vectors.forEach((vectorStr) => {
+      const { transformations, vector } = parseTransformation(vectorStr)
+      const transformed = transformations.reduce((acc, transformation) => {
+        return applyTransformation(acc, transformation)
+      }, vector || [])
+      result.push(transformed.map(numToNote))
     })
     return result
   }
 
-  const allTransformedNotes = useMemo(() => applyTransformations(selectedNotes), [selectedNotes, vectors])
+  const allTransformedNotes = useMemo(() => applyTransformations(selectedNotes.map(noteToNum)), [selectedNotes, vectors])
 
   const fillColor = (d) => {
     if (selectedNotes.includes(d.note)) {

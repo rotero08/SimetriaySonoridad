@@ -3,8 +3,9 @@ import Box from '@mui/material/Box'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
 import MenuIcon from '@mui/icons-material/Menu'
-import { useTheme, useMediaQuery, TextField, IconButton as MuiIconButton, Typography } from '@mui/material'
+import { useTheme, useMediaQuery, TextField, IconButton as MuiIconButton, Tooltip } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
+import MergeIcon from '@mui/icons-material/MergeType' // Assuming you have this icon
 
 const notes = [
   { note: 'C', num: 0 },
@@ -37,18 +38,22 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
   }
 
   const parseTransformation = (input) => {
-    if (typeof input !== 'string') {
-      return { transformation: 0, vector: [] }
+    const regex = /^(T|I)(\d+)\((.*)\)$/
+
+    const parseNested = (input) => {
+      const match = input.match(regex)
+      if (match) {
+        const type = match[1]
+        const value = parseInt(match[2], 10)
+        const { transformations, vector } = parseNested(match[3])
+        return { transformations: [{ type, value }, ...transformations], vector }
+      } else {
+        const vector = input.replace(/[[\]]/g, '').split(',').map(val => val.trim()).map(val => (isNaN(val) ? noteToNum(val) : parseInt(val, 10)))
+        return { transformations: [], vector }
+      }
     }
-    const match = input.match(/^T(\d+)\(\[(.*)\]\)$/)
-    if (match) {
-      const transformation = parseInt(match[1], 10)
-      const vector = match[2].split(',').map(val => val.trim()).map(val => (isNaN(val) ? noteToNum(val) : parseInt(val, 10)))
-      return { transformation, vector }
-    } else {
-      const vector = input.replace(/[[\]]/g, '').split(',').map(val => val.trim()).map(val => (isNaN(val) ? noteToNum(val) : parseInt(val, 10)))
-      return { transformation: 0, vector }
-    }
+
+    return parseNested(input)
   }
 
   const validateVector = (vector) => {
@@ -58,10 +63,11 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
 
   const handleEditVector = (index) => {
     setEditVectorIndex(index)
-    const { transformation, vector } = parseTransformation(vectors[index])
-    if (transformation !== null && vector !== null) {
+    const { transformations, vector } = parseTransformation(vectors[index])
+    if (transformations !== null && vector !== null) {
       const displayVector = vector.map(val => showNoteNames ? (isNaN(val) ? val : numToNote(val)) : (isNaN(val) ? noteToNum(val) : val)).join(', ')
-      setTempVector(transformation ? `T${transformation}([${displayVector}])` : `[${displayVector}]`)
+      const transformationStr = transformations.map(t => `${t.type}${t.value}`).join('(') + (transformations.length > 0 ? '(' : '') + `[${displayVector}]` + ')'.repeat(transformations.length)
+      setTempVector(transformationStr)
     } else {
       setTempVector(vectors[index])
     }
@@ -69,10 +75,11 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
   }
 
   const handleSaveVector = (index) => {
-    const { transformation, vector } = parseTransformation(tempVector)
-    if (transformation !== null && vector !== null && validateVector(vector)) {
-      const updatedVector = transformation ? `T${transformation}([${vector.map(val => isNaN(val) ? noteToNum(val) : val).join(', ')}])` : `[${vector.map(val => isNaN(val) ? noteToNum(val) : val).join(', ')}]`
-      const newVectors = vectors.map((vec, i) => (i === index ? updatedVector : vec))
+    const { transformations, vector } = parseTransformation(tempVector)
+    if (transformations !== null && vector !== null && validateVector(vector)) {
+      const displayVector = vector.map(val => isNaN(val) ? noteToNum(val) : val).join(', ')
+      const transformationStr = transformations.map(t => `${t.type}${t.value}`).join('(') + (transformations.length > 0 ? '(' : '') + `[${displayVector}]` + ')'.repeat(transformations.length)
+      const newVectors = vectors.map((vec, i) => (i === index ? transformationStr : vec))
       setVectors(newVectors)
       setEditVectorIndex(null)
       setErrorMessage('')
@@ -104,44 +111,86 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
     setVectors(vectors.filter((_, i) => i !== index))
   }
 
+  const applyTransformation = (vector, transformation) => {
+    if (transformation.type === 'T') {
+      return vector.map(note => (note + transformation.value) % 12)
+    } else if (transformation.type === 'I') {
+      return vector.map(note => (2 * transformation.value - note + 12) % 12)
+    }
+    return vector
+  }
+
+  const combineTransformations = (index) => {
+    const { transformations, vector } = parseTransformation(vectors[index])
+    const transformedVector = transformations.reduce((acc, curr) => applyTransformation(acc, curr), vector)
+    const combinedTransformation = transformations.filter(t => t.type === 'T').reduce((acc, curr) => acc + curr.value, 0)
+    const inversionTransformations = transformations.filter(t => t.type === 'I')
+    const combinedVector = inversionTransformations.length
+      ? `${inversionTransformations.map(t => `I${t.value}`).join('(')}(T${combinedTransformation}([${transformedVector.join(', ')}]))${')'.repeat(inversionTransformations.length)}`
+      : `T${combinedTransformation}([${transformedVector.join(', ')}])`
+    const newVectors = vectors.map((vec, i) => (i === index ? combinedVector : vec))
+    setVectors(newVectors)
+  }
+
   const drawerWidth = isMobile ? '60%' : 450
 
   const DrawerList = (
     <Box sx={{ width: drawerWidth }} role="presentation" edge="start">
       <Box sx={{ padding: 2 }}>
         {vectors.map((vector, index) => {
-          const { transformation, vector: parsedVector } = parseTransformation(vector)
+          const { transformations, vector: parsedVector } = parseTransformation(vector)
           const displayVector = parsedVector.map(val => showNoteNames ? (isNaN(val) ? val : numToNote(val)) : (isNaN(val) ? noteToNum(val) : val)).join(', ')
+          const transformationStr = transformations.map(t => `${t.type}${t.value}`).join('(') + (transformations.length > 0 ? '(' : '') + `[${displayVector}]` + ')'.repeat(transformations.length)
           return (
-            <Box key={index} sx={{ display: 'flex', alignItems: 'center', marginBottom: 2 }}>
-              {editVectorIndex === index ? (
-                <TextField
-                  value={tempVector}
-                  onChange={handleTempVectorChange}
-                  onBlur={() => handleBlur(index)}
-                  onKeyPress={(e) => handleKeyPress(e, index)}
-                  fullWidth
-                  margin="dense"
-                  sx={{ marginRight: 1 }}
-                  error={!!errorMessage}
-                  helperText={errorMessage}
-                />
-              ) : (
-                <TextField
-                  label={`Vector ${index + 1}`}
-                  value={transformation ? `T${transformation}([${displayVector}])` : `[${displayVector}]`}
-                  onClick={() => handleEditVector(index)}
-                  fullWidth
-                  margin="dense"
-                  sx={{ marginRight: 1 }}
-                  InputProps={{
-                    readOnly: true,
+            <Box key={index} sx={{ marginBottom: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}>
+                {editVectorIndex === index ? (
+                  <TextField
+                    value={tempVector}
+                    onChange={handleTempVectorChange}
+                    onBlur={() => handleBlur(index)}
+                    onKeyPress={(e) => handleKeyPress(e, index)}
+                    fullWidth
+                    margin="dense"
+                    sx={{ marginBottom: 0, marginRight: 1 }}
+                    error={!!errorMessage}
+                    helperText={errorMessage}
+                  />
+                ) : (
+                  <TextField
+                    label={`Vector ${index + 1}`}
+                    value={transformationStr}
+                    onClick={() => handleEditVector(index)}
+                    fullWidth
+                    margin="dense"
+                    sx={{ marginBottom: 0, marginRight: 1 }}
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                  />
+                )}
+                <MuiIconButton edge="end" aria-label="delete" onClick={() => removeVector(index)} sx={{ padding: 0 }}>
+                  <DeleteIcon />
+                </MuiIconButton>
+              </Box>
+              <Tooltip title="Combine Transformations">
+                <MuiIconButton
+                  aria-label="combine"
+                  onClick={() => combineTransformations(index)}
+                  sx={{
+                    margin: 0,
+                    padding: 0,
+                    display: 'block',
+                    '& .MuiIconButton-root': {
+                      padding: '0px',
+                      width: '24px',
+                      height: '24px',
+                    },
                   }}
-                />
-              )}
-              <MuiIconButton edge="end" aria-label="delete" onClick={() => removeVector(index)}>
-                <DeleteIcon />
-              </MuiIconButton>
+                >
+                  <MergeIcon fontSize="small" />
+                </MuiIconButton>
+              </Tooltip>
             </Box>
           )
         })}
@@ -182,4 +231,3 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
     </Box>
   )
 }
-
