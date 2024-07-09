@@ -43,22 +43,6 @@ const OptionsMenu = ({ numSelected, setNumSelected, showNoteNames, setShowNoteNa
           <Paper>
             <Box sx={{ width: 300, padding: 2 }}>
               <Typography variant="h6" gutterBottom>Options</Typography>
-              <Divider />
-              <FormControlLabel control={<Checkbox />} label="Invert Contrast" />
-              <FormControlLabel control={<Checkbox />} label="Braille Mode" />
-              <FormControlLabel control={<Checkbox defaultChecked />} label="Grid" />
-              <FormControlLabel control={<Checkbox defaultChecked />} label="Axis Numbers" />
-              <FormControlLabel control={<Checkbox />} label="Small Grid" />
-              <FormControlLabel control={<Checkbox />} label="Arrows" />
-              <Divider />
-              <Typography variant="subtitle1" gutterBottom>X Axis</Typography>
-              <Typography variant="subtitle2">Range: -10 to 10</Typography>
-              <Typography variant="subtitle1" gutterBottom>Y Axis</Typography>
-              <Typography variant="subtitle2">Range: -10.62 to 10.62</Typography>
-              <Divider />
-              <FormControlLabel control={<Checkbox />} label="Radians" />
-              <FormControlLabel control={<Checkbox />} label="Degrees" />
-              <Divider />
               <FormControlLabel
                 control={<Checkbox checked={showNoteNames} onChange={handleShowNoteNamesChange} />}
                 label="Show Note Names"

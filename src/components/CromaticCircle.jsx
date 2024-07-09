@@ -23,8 +23,7 @@ const generateColor = (index) => `hsl(${index * 137.508}, 100%, 50%)`
 const noteToNum = note => notes.find(n => n.note === note)?.num
 const numToNote = num => notes.find(n => n.num === num)?.note
 
-function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors, setVectors, showNoteNames }) {
-  console.log(vectors)
+function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors, setVectors, showNoteNames, originalVectorsShown }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [size, setSize] = useState(window.innerWidth * 0.9)
@@ -64,7 +63,7 @@ function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors,
         const type = match[1]
         const value = parseInt(match[2], 10)
         const { transformations, vector } = parseNested(match[3])
-        return { transformations: [{ type, value }, ...transformations], vector }
+        return { transformations: [...transformations, { type, value }], vector }
       } else {
         const vector = input.replace(/[[\]]/g, '').split(',').map(val => val.trim()).map(val => (isNaN(val) ? noteToNum(val) : parseInt(val, 10)))
         return { transformations: [], vector }
@@ -85,17 +84,20 @@ function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors,
 
   const applyTransformations = (initialNotes) => {
     let result = [initialNotes]
-    vectors.forEach((vectorStr) => {
+    vectors.forEach((vectorStr, index) => {
       const { transformations, vector } = parseTransformation(vectorStr)
-      const transformed = transformations.reduce((acc, transformation) => {
+      const transformed = transformations.reduceRight((acc, transformation) => {
         return applyTransformation(acc, transformation)
       }, vector || [])
       result.push(transformed.map(numToNote))
+      if (originalVectorsShown[index]) {
+        result.push(vector.map(numToNote))
+      }
     })
     return result
   }
 
-  const allTransformedNotes = useMemo(() => applyTransformations(selectedNotes.map(noteToNum)), [selectedNotes, vectors])
+  const allTransformedNotes = useMemo(() => applyTransformations(selectedNotes.map(noteToNum)), [selectedNotes, vectors, originalVectorsShown])
 
   const fillColor = (d) => {
     if (selectedNotes.includes(d.note)) {

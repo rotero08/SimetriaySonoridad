@@ -3,7 +3,7 @@ import Box from '@mui/material/Box'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
 import MenuIcon from '@mui/icons-material/Menu'
-import { useTheme, useMediaQuery, TextField, IconButton as MuiIconButton, Tooltip } from '@mui/material'
+import { useTheme, useMediaQuery, TextField, IconButton as MuiIconButton, Tooltip, Checkbox } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import MergeIcon from '@mui/icons-material/MergeType' // Assuming you have this icon
 
@@ -25,7 +25,7 @@ const notes = [
 const noteToNum = note => notes.find(n => n.note === note)?.num
 const numToNote = num => notes.find(n => n.num === num)?.note
 
-export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) {
+export default function TemporaryDrawer({ vectors, setVectors, showNoteNames, originalVectorsShown, setOriginalVectorsShown }) {
   const [open, setOpen] = useState(false)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -46,7 +46,7 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
         const type = match[1]
         const value = parseInt(match[2], 10)
         const { transformations, vector } = parseNested(match[3])
-        return { transformations: [{ type, value }, ...transformations], vector }
+        return { transformations: [...transformations, { type, value }], vector }
       } else {
         const vector = input.replace(/[[\]]/g, '').split(',').map(val => val.trim()).map(val => (isNaN(val) ? noteToNum(val) : parseInt(val, 10)))
         return { transformations: [], vector }
@@ -109,6 +109,7 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
 
   const removeVector = (index) => {
     setVectors(vectors.filter((_, i) => i !== index))
+    setOriginalVectorsShown(originalVectorsShown.filter((_, i) => i !== index))
   }
 
   const applyTransformation = (vector, transformation) => {
@@ -132,6 +133,12 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
     setVectors(newVectors)
   }
 
+  const toggleOriginalVectorShown = (index) => {
+    const newShown = [...originalVectorsShown]
+    newShown[index] = !newShown[index]
+    setOriginalVectorsShown(newShown)
+  }
+
   const drawerWidth = isMobile ? '60%' : 450
 
   const DrawerList = (
@@ -144,6 +151,10 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
           return (
             <Box key={index} sx={{ marginBottom: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}>
+                <Checkbox
+                  checked={!!originalVectorsShown[index]}
+                  onChange={() => toggleOriginalVectorShown(index)}
+                />
                 {editVectorIndex === index ? (
                   <TextField
                     value={tempVector}
@@ -231,3 +242,5 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames }) 
     </Box>
   )
 }
+
+

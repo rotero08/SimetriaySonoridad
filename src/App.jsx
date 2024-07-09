@@ -9,6 +9,7 @@ function App() {
   const [numSelected, setNumSelected] = useState(2)
   const [vectors, setVectors] = useState([])
   const [showNoteNames, setShowNoteNames] = useState(false)
+  const [originalVectorsShown, setOriginalVectorsShown] = useState([])
 
   return (
     <div className="app-container">
@@ -22,6 +23,8 @@ function App() {
         vectors={vectors}
         setVectors={setVectors}
         showNoteNames={showNoteNames}
+        originalVectorsShown={originalVectorsShown}
+        setOriginalVectorsShown={setOriginalVectorsShown}
       />
       <div className="center-container">
         <CromaticCircle
@@ -30,6 +33,7 @@ function App() {
           numSelected={numSelected}
           vectors={vectors}
           setVectors={setVectors}
+          originalVectorsShown={originalVectorsShown}
         />
       </div>
       <div className="piano-container">
@@ -40,3 +44,4 @@ function App() {
 }
 
 export default App
+
