@@ -23,7 +23,7 @@ const generateColor = (index) => `hsl(${index * 137.508}, 100%, 50%)`
 const noteToNum = note => notes.find(n => n.note === note)?.num
 const numToNote = num => notes.find(n => n.num === num)?.note
 
-function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors, setVectors, showNoteNames, originalVectorsShown }) {
+function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors, setVectors, showNoteNames, originalVectorsShown, inversionAxesShown }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [size, setSize] = useState(window.innerWidth * 0.9)
@@ -146,6 +146,13 @@ function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors,
   const points = useMemo(() => getPoints(selectedNotes), [selectedNotes, radius])
   const allPoints = useMemo(() => allTransformedNotes.map(getPoints), [allTransformedNotes, radius])
 
+  const getAxisPoints = (noteNum) => {
+    const angle = (((noteNum * 360) / notes.length - 90) * Math.PI) / 180
+    const x = radius * Math.cos(angle)
+    const y = radius * Math.sin(angle)
+    return { x, y }
+  }
+
   return (
     <svg width={width} height={height}>
       <g transform={`translate(${width / 2}, ${height / 2})`}>
@@ -230,6 +237,28 @@ function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors,
             )
           })
         )}
+        {vectors.map((vectorStr, index) => {
+          if (inversionAxesShown[index]) {
+            const { transformations } = parseTransformation(vectorStr)
+            const inversion = transformations.find(t => t.type === 'I')
+            if (inversion) {
+              const axisPoints = getAxisPoints(inversion.value)
+              return (
+                <line
+                  key={`axis-${index}`}
+                  x1={-axisPoints.x}
+                  y1={-axisPoints.y}
+                  x2={axisPoints.x}
+                  y2={axisPoints.y}
+                  stroke={generateColor(index + 1)}
+                  strokeWidth={2}
+                  strokeDasharray="4"
+                />
+              )
+            }
+          }
+          return null
+        })}
       </g>
     </svg>
   )

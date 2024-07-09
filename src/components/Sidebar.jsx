@@ -25,7 +25,7 @@ const notes = [
 const noteToNum = note => notes.find(n => n.note === note)?.num
 const numToNote = num => notes.find(n => n.num === num)?.note
 
-export default function TemporaryDrawer({ vectors, setVectors, showNoteNames, originalVectorsShown, setOriginalVectorsShown }) {
+export default function TemporaryDrawer({ vectors, setVectors, showNoteNames, originalVectorsShown, setOriginalVectorsShown, inversionAxesShown, setInversionAxesShown }) {
   const [open, setOpen] = useState(false)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
@@ -110,6 +110,7 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames, or
   const removeVector = (index) => {
     setVectors(vectors.filter((_, i) => i !== index))
     setOriginalVectorsShown(originalVectorsShown.filter((_, i) => i !== index))
+    setInversionAxesShown(inversionAxesShown.filter((_, i) => i !== index))
   }
 
   const applyTransformation = (vector, transformation) => {
@@ -139,6 +140,12 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames, or
     setOriginalVectorsShown(newShown)
   }
 
+  const toggleInversionAxisShown = (index) => {
+    const newShown = [...inversionAxesShown]
+    newShown[index] = !newShown[index]
+    setInversionAxesShown(newShown)
+  }
+
   const drawerWidth = isMobile ? '60%' : 450
 
   const DrawerList = (
@@ -154,6 +161,10 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames, or
                 <Checkbox
                   checked={!!originalVectorsShown[index]}
                   onChange={() => toggleOriginalVectorShown(index)}
+                />
+                <Checkbox
+                  checked={!!inversionAxesShown[index]}
+                  onChange={() => toggleInversionAxisShown(index)}
                 />
                 {editVectorIndex === index ? (
                   <TextField

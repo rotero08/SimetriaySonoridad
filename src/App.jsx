@@ -10,6 +10,7 @@ function App() {
   const [vectors, setVectors] = useState([])
   const [showNoteNames, setShowNoteNames] = useState(false)
   const [originalVectorsShown, setOriginalVectorsShown] = useState([])
+  const [inversionAxesShown, setInversionAxesShown] = useState([])
 
   return (
     <div className="app-container">
@@ -25,6 +26,8 @@ function App() {
         showNoteNames={showNoteNames}
         originalVectorsShown={originalVectorsShown}
         setOriginalVectorsShown={setOriginalVectorsShown}
+        inversionAxesShown={inversionAxesShown}
+        setInversionAxesShown={setInversionAxesShown}
       />
       <div className="center-container">
         <CromaticCircle
@@ -34,6 +37,7 @@ function App() {
           vectors={vectors}
           setVectors={setVectors}
           originalVectorsShown={originalVectorsShown}
+          inversionAxesShown={inversionAxesShown}
         />
       </div>
       <div className="piano-container">
