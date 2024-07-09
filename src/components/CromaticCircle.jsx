@@ -77,7 +77,7 @@ function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors,
     if (transformation.type === 'T') {
       return vector.map(note => (note + transformation.value) % 12)
     } else if (transformation.type === 'I') {
-      return vector.map(note => (2 * transformation.value - note + 12) % 12)
+      return vector.map(note => (-note + transformation.value + 12) % 12)
     }
     return vector
   }
