@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import * as d3 from 'd3'
 import { useTheme, useMediaQuery } from '@mui/material'
+import { vector } from '@observablehq/plot'
 
 const notes = [
   { note: 'C', num: 0 },
@@ -23,7 +24,7 @@ const generateColor = (index) => `hsl(${index * 137.508}, 100%, 50%)`
 const noteToNum = note => notes.find(n => n.note === note)?.num
 const numToNote = num => notes.find(n => n.num === num)?.note
 
-function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors, setVectors, showNoteNames, originalVectorsShown, inversionAxesShown }) {
+function CromaticCircle({ colorMapping, selectedNotes, setSelectedNotes, numSelected, vectors, setVectors, addVector, showNoteNames, originalVectorsShown, inversionAxesShown }) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [size, setSize] = useState(window.innerWidth * 0.9)
@@ -49,7 +50,7 @@ function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors,
   useEffect(() => {
     if (selectedNotes.length === numSelected) {
       const newVector = selectedNotes.map(note => showNoteNames ? noteToNum(note) : note)
-      setVectors([...vectors, `[${newVector.join(',')}]`])
+      addVector(newVector)
       setSelectedNotes([])
     }
   }, [selectedNotes, numSelected, setVectors, vectors, setSelectedNotes, showNoteNames])
@@ -98,14 +99,15 @@ function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors,
   }
 
   const allTransformedNotes = useMemo(() => applyTransformations(selectedNotes.map(noteToNum)), [selectedNotes, vectors, originalVectorsShown])
-
+  console.log(allTransformedNotes)
   const fillColor = (d) => {
     if (selectedNotes.includes(d.note)) {
-      return generateColor(0)
+      const color = 'hsl(100%, 100%, 50%)'
+      return color
     }
     for (let i = 1; i < allTransformedNotes.length; i++) {
       if (allTransformedNotes[i].includes(d.note)) {
-        return generateColor(i)
+        return colorMapping[i-1]
       }
     }
     return 'white'
@@ -190,7 +192,7 @@ function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors,
                 y1={point.y}
                 x2={nextPoint.x}
                 y2={nextPoint.y}
-                stroke={generateColor(allPoints.length - vectorIndex - 1)}
+                stroke={colorMapping[allPoints.length - vectorIndex - 2]}
                 strokeWidth={2}
                 strokeOpacity={0.5}
               />
@@ -250,7 +252,7 @@ function CromaticCircle({ selectedNotes, setSelectedNotes, numSelected, vectors,
                   y1={-axisPoints.y}
                   x2={axisPoints.x}
                   y2={axisPoints.y}
-                  stroke={generateColor(index + 1)}
+                  stroke={colorMapping[index]}
                   strokeWidth={2}
                   strokeDasharray="4"
                 />

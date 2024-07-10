@@ -11,6 +11,29 @@ function App() {
   const [showNoteNames, setShowNoteNames] = useState(false)
   const [originalVectorsShown, setOriginalVectorsShown] = useState([])
   const [inversionAxesShown, setInversionAxesShown] = useState([])
+  const [colorMapping, setColorMapping] = useState([]) // New state for color mapping
+
+  const generateColor = (index) => `hsl(${index * 137.508}, 100%, 50%)`
+  console.log(colorMapping)
+  const addVector = (vector) => {
+    const newVectors = [...vectors, vector]
+
+    let index = newVectors.length - 1
+    let newColor = generateColor(index)
+    while (colorMapping.includes(newColor)) {
+      index++
+      newColor = generateColor(index)
+    }
+
+    const newColorMapping = [...colorMapping, newColor]
+    setVectors([...vectors, `[${vector.join(',')}]`])
+    setColorMapping(newColorMapping)
+  }
+
+  const removeVector = (index) => {
+    const newVectors = vectors.filter((_, i) => i !== index)
+    setVectors(newVectors)
+  }
 
   return (
     <div className="app-container">
@@ -28,6 +51,8 @@ function App() {
         setOriginalVectorsShown={setOriginalVectorsShown}
         inversionAxesShown={inversionAxesShown}
         setInversionAxesShown={setInversionAxesShown}
+        colorMapping={colorMapping}
+        setColorMapping={setColorMapping}
       />
       <div className="center-container">
         <CromaticCircle
@@ -38,6 +63,8 @@ function App() {
           setVectors={setVectors}
           originalVectorsShown={originalVectorsShown}
           inversionAxesShown={inversionAxesShown}
+          addVector={addVector}
+          colorMapping={colorMapping}
         />
       </div>
       <div className="piano-container">

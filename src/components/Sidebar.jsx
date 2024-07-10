@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Box from '@mui/material/Box'
 import Drawer from '@mui/material/Drawer'
 import IconButton from '@mui/material/IconButton'
 import MenuIcon from '@mui/icons-material/Menu'
-import { useTheme, useMediaQuery, TextField, IconButton as MuiIconButton, Tooltip, Checkbox } from '@mui/material'
+import { useTheme, useMediaQuery, TextField, IconButton as MuiIconButton, Tooltip, Checkbox, Popover, Typography, Grid } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import MergeIcon from '@mui/icons-material/MergeType' // Assuming you have this icon
+import MergeIcon from '@mui/icons-material/MergeType'
+import TransformIcon from '@mui/icons-material/Transform'
+import SwapVertIcon from '@mui/icons-material/SwapVert'
 
 const notes = [
   { note: 'C', num: 0 },
@@ -24,14 +26,18 @@ const notes = [
 
 const noteToNum = note => notes.find(n => n.note === note)?.num
 const numToNote = num => notes.find(n => n.num === num)?.note
+const generateColor = (index) => `hsl(${index * 137.508}, 100%, 50%)`
 
-export default function TemporaryDrawer({ vectors, setVectors, showNoteNames, originalVectorsShown, setOriginalVectorsShown, inversionAxesShown, setInversionAxesShown }) {
+export default function TemporaryDrawer({ colorMapping, setColorMapping, vectors, setVectors, showNoteNames, originalVectorsShown, setOriginalVectorsShown, inversionAxesShown, setInversionAxesShown }) {
   const [open, setOpen] = useState(false)
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const [editVectorIndex, setEditVectorIndex] = useState(null)
   const [tempVector, setTempVector] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const [popoverAnchor, setPopoverAnchor] = useState(null)
+  const [popoverType, setPopoverType] = useState('')
+  const [popoverIndex, setPopoverIndex] = useState(null)
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen)
@@ -104,13 +110,22 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames, or
   }
 
   const addVectorField = () => {
-    setVectors([...vectors, '[]'])
+    const newVectors = [...vectors, '[]']
+    const newColorMapping = [...colorMapping, generateColor(vectors.length)]
+    setVectors(newVectors)
+    setColorMapping(newColorMapping)
   }
 
   const removeVector = (index) => {
-    setVectors(vectors.filter((_, i) => i !== index))
-    setOriginalVectorsShown(originalVectorsShown.filter((_, i) => i !== index))
-    setInversionAxesShown(inversionAxesShown.filter((_, i) => i !== index))
+    const newVectors = vectors.filter((_, i) => i !== index)
+    const newOriginalVectorsShown = originalVectorsShown.filter((_, i) => i !== index)
+    const newInversionAxesShown = inversionAxesShown.filter((_, i) => i !== index)
+    const newColorMapping = colorMapping.filter((_, i) => i !== index)
+
+    setVectors(newVectors)
+    setOriginalVectorsShown(newOriginalVectorsShown)
+    setInversionAxesShown(newInversionAxesShown)
+    setColorMapping(newColorMapping)
   }
 
   const applyTransformation = (vector, transformation) => {
@@ -136,14 +151,58 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames, or
 
   const toggleOriginalVectorShown = (index) => {
     const newShown = [...originalVectorsShown]
+    const newColorMapping = [...colorMapping]
+
+    if (newShown[index]) {
+      newColorMapping.splice(index * 2 + 1, 1)
+    } else {
+      newColorMapping.splice(index * 2 + 1, 0, generateColor(colorMapping.length))
+    }
+
     newShown[index] = !newShown[index]
+    setColorMapping(newColorMapping)
     setOriginalVectorsShown(newShown)
   }
 
   const toggleInversionAxisShown = (index) => {
     const newShown = [...inversionAxesShown]
+    const newColorMapping = [...colorMapping]
+
+    if (newShown[index]) {
+      newColorMapping.splice(index * 2 + 1, 1)
+    } else {
+      newColorMapping.splice(index * 2 + 1, 0, generateColor(colorMapping.length))
+    }
+
     newShown[index] = !newShown[index]
+    setColorMapping(newColorMapping)
     setInversionAxesShown(newShown)
+  }
+
+  const handlePopoverOpen = (event, type, index) => {
+    setPopoverAnchor(event.currentTarget)
+    setPopoverType(type)
+    setPopoverIndex(index)
+  }
+
+  const handlePopoverClose = () => {
+    setPopoverAnchor(null)
+    setPopoverType('')
+    setPopoverIndex(null)
+  }
+
+  const handleSelectNumber = (number) => {
+    if (popoverType && popoverIndex !== null) {
+      const type = popoverType
+      const index = popoverIndex
+      const { transformations, vector } = parseTransformation(vectors[index])
+      const updatedTransformations = [...transformations, { type, value: number }]
+      const displayVector = vector.map(val => (isNaN(val) ? noteToNum(val) : val)).join(', ')
+      const transformationStr = updatedTransformations.map(t => `${t.type}${t.value}`).join('(') + (updatedTransformations.length > 0 ? '(' : '') + `[${displayVector}]` + ')'.repeat(updatedTransformations.length)
+      const newVectors = vectors.map((vec, i) => (i === index ? transformationStr : vec))
+      setVectors(newVectors)
+      handlePopoverClose()
+    }
   }
 
   const drawerWidth = isMobile ? '60%' : 450
@@ -158,14 +217,16 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames, or
           return (
             <Box key={index} sx={{ marginBottom: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 0 }}>
-                <Checkbox
-                  checked={!!originalVectorsShown[index]}
-                  onChange={() => toggleOriginalVectorShown(index)}
-                />
-                <Checkbox
-                  checked={!!inversionAxesShown[index]}
-                  onChange={() => toggleInversionAxisShown(index)}
-                />
+                <Box sx={{ display: 'flex', flexDirection: 'column', marginRight: 1 }}>
+                  <Checkbox
+                    checked={!!originalVectorsShown[index]}
+                    onChange={() => toggleOriginalVectorShown(index)}
+                  />
+                  <Checkbox
+                    checked={!!inversionAxesShown[index]}
+                    onChange={() => toggleInversionAxisShown(index)}
+                  />
+                </Box>
                 {editVectorIndex === index ? (
                   <TextField
                     value={tempVector}
@@ -195,24 +256,62 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames, or
                   <DeleteIcon />
                 </MuiIconButton>
               </Box>
-              <Tooltip title="Combine Transformations">
-                <MuiIconButton
-                  aria-label="combine"
-                  onClick={() => combineTransformations(index)}
-                  sx={{
-                    margin: 0,
-                    padding: 0,
-                    display: 'block',
-                    '& .MuiIconButton-root': {
-                      padding: '0px',
-                      width: '24px',
-                      height: '24px',
-                    },
-                  }}
-                >
-                  <MergeIcon fontSize="small" />
-                </MuiIconButton>
-              </Tooltip>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 1 }}>
+                <Tooltip title="Combine Transformations">
+                  <MuiIconButton
+                    aria-label="combine"
+                    onClick={() => combineTransformations(index)}
+                    sx={{
+                      margin: 0,
+                      padding: 0,
+                      display: 'block',
+                      '& .MuiIconButton-root': {
+                        padding: '0px',
+                        width: '24px',
+                        height: '24px',
+                      },
+                    }}
+                  >
+                    <MergeIcon fontSize="small" />
+                  </MuiIconButton>
+                </Tooltip>
+                <Tooltip title="Add Transformation">
+                  <MuiIconButton
+                    aria-label="add-transformation"
+                    onClick={(event) => handlePopoverOpen(event, 'T', index)}
+                    sx={{
+                      margin: 0,
+                      padding: 0,
+                      display: 'block',
+                      '& .MuiIconButton-root': {
+                        padding: '0px',
+                        width: '24px',
+                        height: '24px',
+                      },
+                    }}
+                  >
+                    <TransformIcon fontSize="small" />
+                  </MuiIconButton>
+                </Tooltip>
+                <Tooltip title="Add Inversion">
+                  <MuiIconButton
+                    aria-label="add-inversion"
+                    onClick={(event) => handlePopoverOpen(event, 'I', index)}
+                    sx={{
+                      margin: 0,
+                      padding: 0,
+                      display: 'block',
+                      '& .MuiIconButton-root': {
+                        padding: '0px',
+                        width: '24px',
+                        height: '24px',
+                      },
+                    }}
+                  >
+                    <SwapVertIcon fontSize="small" />
+                  </MuiIconButton>
+                </Tooltip>
+              </Box>
             </Box>
           )
         })}
@@ -250,8 +349,45 @@ export default function TemporaryDrawer({ vectors, setVectors, showNoteNames, or
       >
         {DrawerList}
       </Drawer>
+      <Popover
+        open={Boolean(popoverAnchor)}
+        anchorEl={popoverAnchor}
+        onClose={handlePopoverClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+      >
+        <Box sx={{ p: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>Select number</Typography>
+          <Grid container spacing={1}>
+            {Array.from({ length: 12 }, (_, i) => (
+              <Grid item xs={4} key={i}>
+                <Typography
+                  sx={{
+                    cursor: 'pointer',
+                    textAlign: 'center',
+                    backgroundColor: 'lightgray',
+                    borderRadius: 1,
+                    p: 0.5,
+                    '&:hover': {
+                      backgroundColor: 'gray',
+                      color: 'white'
+                    }
+                  }}
+                  onClick={() => handleSelectNumber(i)}
+                >
+                  {i}
+                </Typography>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+      </Popover>
     </Box>
   )
 }
-
-
