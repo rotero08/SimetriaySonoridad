@@ -19,3 +19,31 @@ html, body, #root, .app-container {
 .piano-container {
   width: 100%;
 }
+
+.play-button {
+  position: absolute;
+  right: 20px;
+  top: -60px; /* Adjust based on your layout */
+}
+
+.play-button-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  padding: 10px;
+}
+
+.play-button {
+  background-color: #6200ea;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.play-button:hover {
+  background-color: #3700b3;
+}

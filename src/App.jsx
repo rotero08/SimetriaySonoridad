@@ -14,7 +14,7 @@ function App() {
   const [colorMapping, setColorMapping] = useState([]) // New state for color mapping
 
   const generateColor = (index) => `hsl(${index * 137.508}, 100%, 50%)`
-  console.log(colorMapping)
+
   const addVector = (vector) => {
     const newVectors = [...vectors, vector]
 
@@ -68,7 +68,10 @@ function App() {
         />
       </div>
       <div className="piano-container">
-        <ResponsivePiano selectedNotes={selectedNotes} />
+        <ResponsivePiano
+          selectedNotes={selectedNotes}
+          vectors={vectors}
+          colorMapping={colorMapping} />
       </div>
     </div>
   )

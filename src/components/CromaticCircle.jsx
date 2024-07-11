@@ -99,7 +99,7 @@ function CromaticCircle({ colorMapping, selectedNotes, setSelectedNotes, numSele
   }
 
   const allTransformedNotes = useMemo(() => applyTransformations(selectedNotes.map(noteToNum)), [selectedNotes, vectors, originalVectorsShown])
-  console.log(allTransformedNotes)
+  //console.log(allTransformedNotes)
   const fillColor = (d) => {
     if (selectedNotes.includes(d.note)) {
       const color = 'hsl(100%, 100%, 50%)'
