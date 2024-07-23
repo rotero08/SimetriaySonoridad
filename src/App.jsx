@@ -3,6 +3,7 @@ import OptionsMenu from './components/OptionsMenu'
 import CromaticCircle from './components/CromaticCircle'
 import TemporaryDrawer from './components/Sidebar'
 import ResponsivePiano from './components/Piano'
+import Tonnetz from './components/Tonnetz'
 
 function App() {
   const [selectedNotes, setSelectedNotes] = useState([])
@@ -55,7 +56,7 @@ function App() {
         setColorMapping={setColorMapping}
       />
       <div className="center-container">
-        <CromaticCircle
+        {/* <CromaticCircle
           selectedNotes={selectedNotes}
           setSelectedNotes={setSelectedNotes}
           numSelected={numSelected}
@@ -65,6 +66,18 @@ function App() {
           inversionAxesShown={inversionAxesShown}
           addVector={addVector}
           colorMapping={colorMapping}
+        /> */}
+        <Tonnetz
+          colorMapping={colorMapping}
+          selectedNotes={selectedNotes}
+          setSelectedNotes={setSelectedNotes}
+          numSelected={numSelected}
+          vectors={vectors}
+          setVectors={setVectors}
+          addVector={addVector}
+          showNoteNames={showNoteNames}
+          originalVectorsShown={originalVectorsShown}
+          inversionAxesShown={inversionAxesShown}
         />
       </div>
       <div className="piano-container">

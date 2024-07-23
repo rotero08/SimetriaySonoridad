@@ -8,6 +8,9 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import MergeIcon from '@mui/icons-material/MergeType'
 import TransformIcon from '@mui/icons-material/Transform'
 import SwapVertIcon from '@mui/icons-material/SwapVert'
+import PIcon from '@mui/icons-material/ArrowUpward' // Use an appropriate icon
+import RIcon from '@mui/icons-material/ArrowForward' // Use an appropriate icon
+import LIcon from '@mui/icons-material/ArrowDownward' // Use an appropriate icon
 
 const notes = [
   { note: 'C', num: 0 },
@@ -27,6 +30,24 @@ const notes = [
 const noteToNum = note => notes.find(n => n.note === note)?.num
 const numToNote = num => notes.find(n => n.num === num)?.note
 const generateColor = (index) => `hsl(${index * 137.508}, 100%, 50%)`
+
+const applyP = (vector) => {
+  const root = vector[0]
+  const isMajor = vector.includes((root + 4) % 12)
+  return isMajor ? [root, (root + 3) % 12, (root + 7) % 12] : [root, (root + 4) % 12, (root + 7) % 12]
+}
+
+const applyR = (vector) => {
+  const root = vector[0]
+  const isMajor = vector.includes((root + 4) % 12)
+  return isMajor ? [(root + 9) % 12, (root + 12) % 12, (root + 16) % 12] : [(root + 3) % 12, (root + 7) % 12, (root + 10) % 12]
+}
+
+const applyL = (vector) => {
+  const root = vector[0]
+  const isMajor = vector.includes((root + 4) % 12)
+  return isMajor ? [(root - 1 + 12) % 12, (root + 4) % 12, (root + 7) % 12] : [root, (root + 4) % 12, (root + 8) % 12]
+}
 
 export default function TemporaryDrawer({ colorMapping, setColorMapping, vectors, setVectors, showNoteNames, originalVectorsShown, setOriginalVectorsShown, inversionAxesShown, setInversionAxesShown }) {
   const [open, setOpen] = useState(false)
@@ -205,6 +226,22 @@ export default function TemporaryDrawer({ colorMapping, setColorMapping, vectors
     }
   }
 
+  const applyOperation = (index, operation) => {
+    const { vector } = parseTransformation(vectors[index])
+    let newVector = []
+
+    if (operation === 'P') {
+      newVector = applyP(vector)
+    } else if (operation === 'R') {
+      newVector = applyR(vector)
+    } else if (operation === 'L') {
+      newVector = applyL(vector)
+    }
+
+    const newVectors = vectors.map((vec, i) => (i === index ? `[${newVector.join(', ')}]` : vec))
+    setVectors(newVectors)
+  }
+
   const drawerWidth = isMobile ? '60%' : 450
 
   const DrawerList = (
@@ -309,6 +346,60 @@ export default function TemporaryDrawer({ colorMapping, setColorMapping, vectors
                     }}
                   >
                     <SwapVertIcon fontSize="small" />
+                  </MuiIconButton>
+                </Tooltip>
+                <Tooltip title="Apply P Operation">
+                  <MuiIconButton
+                    aria-label="apply-P"
+                    onClick={() => applyOperation(index, 'P')}
+                    sx={{
+                      margin: 0,
+                      padding: 0,
+                      display: 'block',
+                      '& .MuiIconButton-root': {
+                        padding: '0px',
+                        width: '24px',
+                        height: '24px',
+                      },
+                    }}
+                  >
+                    <PIcon fontSize="small" />
+                  </MuiIconButton>
+                </Tooltip>
+                <Tooltip title="Apply R Operation">
+                  <MuiIconButton
+                    aria-label="apply-R"
+                    onClick={() => applyOperation(index, 'R')}
+                    sx={{
+                      margin: 0,
+                      padding: 0,
+                      display: 'block',
+                      '& .MuiIconButton-root': {
+                        padding: '0px',
+                        width: '24px',
+                        height: '24px',
+                      },
+                    }}
+                  >
+                    <RIcon fontSize="small" />
+                  </MuiIconButton>
+                </Tooltip>
+                <Tooltip title="Apply L Operation">
+                  <MuiIconButton
+                    aria-label="apply-L"
+                    onClick={() => applyOperation(index, 'L')}
+                    sx={{
+                      margin: 0,
+                      padding: 0,
+                      display: 'block',
+                      '& .MuiIconButton-root': {
+                        padding: '0px',
+                        width: '24px',
+                        height: '24px',
+                      },
+                    }}
+                  >
+                    <LIcon fontSize="small" />
                   </MuiIconButton>
                 </Tooltip>
               </Box>
