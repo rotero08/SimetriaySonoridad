@@ -6,7 +6,7 @@ const notes = [
   { note: 'C', num: 0 },
   { note: 'C#', num: 1 },
   { note: 'D', num: 2 },
-  { note: 'Eb', num: 3 },
+  { note: 'E♭', num: 3 },
   { note: 'E', num: 4 },
   { note: 'F', num: 5 },
   { note: 'F#', num: 6 },
@@ -59,9 +59,9 @@ const TonnetzGraph = ({ colorMapping, selectedNotes, setSelectedNotes, numSelect
       { id: 11, label: 'C', x: 400, y: 250 },
       { id: 12, label: 'G', x: 550, y: 250 },
       { id: 13, label: 'D', x: 700, y: 250 },
-      { id: 14, label: 'Db', x: 180, y: 350 },
-      { id: 15, label: 'Ab', x: 330, y: 350 },
-      { id: 16, label: 'Eb', x: 480, y: 350 },
+      { id: 14, label: 'D♭', x: 180, y: 350 },
+      { id: 15, label: 'A♭', x: 330, y: 350 },
+      { id: 16, label: 'E♭', x: 480, y: 350 },
       { id: 17, label: 'B♭', x: 630, y: 350 }
     ]
 

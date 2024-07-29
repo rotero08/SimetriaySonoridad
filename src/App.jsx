@@ -16,8 +16,8 @@ function App() {
   const [showNoteNames, setShowNoteNames] = useState(false)
   const [originalVectorsShown, setOriginalVectorsShown] = useState([])
   const [inversionAxesShown, setInversionAxesShown] = useState([])
-  const [colorMapping, setColorMapping] = useState([]) // New state for color mapping
-  const [showTonnetz, setShowTonnetz] = useState(false) // Default to Chromatic Circle
+  const [colorMapping, setColorMapping] = useState([])
+  const [showTonnetz, setShowTonnetz] = useState(false)
 
   const generateColor = (index) => `hsl(${index * 137.508}, 100%, 50%)`
 
@@ -123,6 +123,7 @@ function App() {
           selectedNotes={selectedNotes}
           vectors={vectors}
           colorMapping={colorMapping}
+          addVector={addVector}
         />
       </div>
     </div>

@@ -5,13 +5,12 @@ import SoundfontProvider from '../piano_tools/SoundfontProvider'
 import DimensionsProvider from '../piano_tools/DimensionsProvider'
 import React, { useState } from 'react'
 
-// webkitAudioContext fallback needed to support Safari
 const audioContext = new (window.AudioContext || window.webkitAudioContext)()
 const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net'
 
-const minKeyWidth = 40 // Minimum width of a key in pixels
-const firstNote = MidiNumbers.fromNote('c3') // MIDI number for C3
-const lastNote = MidiNumbers.fromNote('f4') // MIDI number for F4
+const minKeyWidth = 40
+const firstNote = MidiNumbers.fromNote('c3')
+const lastNote = MidiNumbers.fromNote('f4')
 
 const noteRange = {
   first: MidiNumbers.fromNote('c3'),
@@ -39,15 +38,23 @@ const noteToMidi = {
   'B': MidiNumbers.fromNote('b3')
 }
 
+const noteNameToMidiNumber = {
+  'C': 0, 'C♯': 1, 'D': 2, 'E♭': 3, 'E': 4, 'F': 5, 'F♯': 6,
+  'G': 7, 'G♯': 8, 'A': 9, 'B♭': 10, 'B': 11
+}
+
 const vectorToMidiNumbers = (vector) => {
-  const noteNameToMidiNumber = {
-    'C': 0, 'C♯': 1, 'D': 2, 'E♭': 3, 'E': 4, 'F': 5, 'F♯': 6,
-    'G': 7, 'G♯': 8, 'A': 9, 'B♭': 10, 'B': 11
-  }
   const baseMidiNumber = MidiNumbers.fromNote('c3')
   const noteNames = vector.replace(/[[\]]/g, '').split(',')
 
-  return noteNames.map(note => baseMidiNumber + noteNameToMidiNumber[note.trim()])
+  return noteNames.map(note => {
+    note = note.trim()
+    if (isNaN(note)) {
+      return baseMidiNumber + noteNameToMidiNumber[note]
+    } else {
+      return baseMidiNumber + parseInt(note)
+    }
+  })
 }
 
 const getNoteNameWithOctave = (midiNumber) => {
@@ -57,10 +64,13 @@ const getNoteNameWithOctave = (midiNumber) => {
   return `${noteNames[noteIndex]}${octave}`
 }
 
-export default function ResponsivePiano({ vectors, colorMapping, selectedNotes }) {
-  const [activeNotes, setActiveNotes] = useState([])
+const getNoteIndex = (midiNumber) => midiNumber % 12
 
-  // Convert selected notes to MIDI numbers
+export default function ResponsivePiano({ vectors, colorMapping, selectedNotes, addVector }) {
+  const [activeNotes, setActiveNotes] = useState([])
+  const [isRecording, setIsRecording] = useState(false)
+  const [recordedNotes, setRecordedNotes] = useState([])
+
   const activeMidiNotes = selectedNotes.map(note => noteToMidi[note])
 
   const getNoteColor = (midiNumber) => {
@@ -92,35 +102,47 @@ export default function ResponsivePiano({ vectors, colorMapping, selectedNotes }
 
   const playVectors = (playNote, stopNote) => {
     let delay = 0
-    const chordDuration = 500 // milliseconds
+    const chordDuration = 500
 
     vectors.forEach((vector, index) => {
       const midiNumbers = vectorToMidiNumbers(vector).sort((a, b) => a - b)
 
       setTimeout(() => {
-        // Stop previous notes
-        setActiveNotes([]) // Clear the active notes
+        setActiveNotes([])
         activeNotes.forEach((midiNumber) => {
           stopNote(midiNumber)
         })
 
-        // Play new chord
         midiNumbers.forEach((midiNumber) => {
           playNote(midiNumber)
         })
-        setActiveNotes(midiNumbers) // Set the active notes to highlight on the piano
+        setActiveNotes(midiNumbers)
       }, delay)
 
       delay += chordDuration
     })
 
-    // Ensure to stop the final chord
     setTimeout(() => {
       activeNotes.forEach((midiNumber) => {
         stopNote(midiNumber)
       })
-      setActiveNotes([]) // Clear the active notes
+      setActiveNotes([])
     }, delay + chordDuration)
+  }
+
+  const handlePlayNote = (midiNumber) => {
+    if (isRecording) {
+      setRecordedNotes((prev) => [...prev, getNoteIndex(midiNumber)])
+    }
+  }
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      const uniqueNotes = Array.from(new Set(recordedNotes))
+      addVector(uniqueNotes)
+      setRecordedNotes([])
+    }
+    setIsRecording(!isRecording)
   }
 
   return (
@@ -141,15 +163,21 @@ export default function ResponsivePiano({ vectors, colorMapping, selectedNotes }
               render={({ isLoading, playNote, stopNote }) => (
                 <>
                   <button onClick={() => playVectors(playNote, stopNote)}>Play Vectors</button>
+                  <button onClick={toggleRecording}>
+                    {isRecording ? 'Stop Recording' : 'Start Recording'}
+                  </button>
                   <Piano
                     noteRange={noteRange}
                     width={containerWidth}
-                    playNote={playNote}
+                    playNote={(midiNumber) => {
+                      playNote(midiNumber)
+                      handlePlayNote(midiNumber)
+                    }}
                     stopNote={stopNote}
                     disabled={isLoading}
                     renderNoteLabel={renderNoteLabel}
                     keyboardShortcuts={keyboardShortcuts}
-                    activeNotes={activeNotes} // Ensure the piano updates to reflect active notes
+                    activeNotes={activeNotes}
                   />
                 </>
               )}
